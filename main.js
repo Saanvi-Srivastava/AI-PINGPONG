@@ -1,4 +1,3 @@
-
 /*created by prashant shukla */
 
 var paddle2 =10,paddle1=10;
@@ -21,35 +20,33 @@ var ball = {
     dy:3
 }
 
-rightWristX = "";
-rightWristY = "";
-scoreRightWrist = "";
+rightWristY = 0;
+rightWristX = 0;
+scoreRightWrist = 0;
+GameStatus = "";
+
+function StartGame()
+{
+  GameStatus = "start";
+  document.getElementById("status").innerHTML = "Game Loading";
+}
 
 function setup(){
   var canvas =  createCanvas(700,600);
   canvas.parent('canvas');
   video = createCapture(VIDEO);
-  video.size(700,600);
+  video.size(700, 600);
   video.hide();
-
-
-}
-
-
-function draw(){
-  image(video, 0, 0, 700, 600);
+  
   poseNet = ml5.poseNet(video, modelLoaded);
   poseNet.on('pose', gotPoses);
-
-  if(scoreRightWrist > 0.2)
-  {
-    fill("#FF000");
-    stroke("#FF000");
-    circle(rightWristX, rightWristY, 50);
   }
+  
+function draw(){
+  background(0); 
+  image(video, 0, 0, 700, 600);
 
- background(0); 
-
+  
  fill("black");
  stroke("black");
  rect(680,0,20,700);
@@ -57,15 +54,26 @@ function draw(){
  fill("black");
  stroke("black");
  rect(0,0,20,700);
- 
+
+
+  if(scoreRightWrist > 0.2)
+  {
+    fill("darkblue");
+    stroke("darkblue");
+    circle(rightWristX, rightWristY, 50);
+  }
+
+  if( GameStatus == "start")
+  {
+      document.getElementById("status").innerHTML = "Game Loaded";
    //funtion paddleInCanvas call 
    paddleInCanvas();
  
    //left paddle
    fill(250,0,0);
     stroke(0,0,250);
-    strokeWeight(0.5);
-   paddle1Y = mouseY; 
+  strokeWeight(0.5);
+  paddle1Y = rightWristY; 
    rect(paddle1X,paddle1Y,paddle1,paddle1Height,100);
    
    
@@ -85,7 +93,7 @@ function draw(){
    
    //function move call which in very important
     move();
-
+  }
    
 }
 
@@ -94,8 +102,9 @@ function gotPoses(results)
 	if(results.length > 0)
 	{
 		console.log(results);
-		rightWristX = results[0].pose.wrist.x;
-		rightWristY = results[0].pose.wrist.y;
+		rightWristX = results[0].pose.rightWrist.x;
+		rightWristY = results[0].pose.rightWrist.y;
+    scoreRightWrist =  results[0].pose.keypoints[10].score;
 	}
 }
 
